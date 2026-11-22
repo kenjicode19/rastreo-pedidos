@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rastreo de Pedidos | Japón</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; padding: 40px 16px; margin: 0; }
+    .card { background: #1e293b; border-radius: 12px; padding: 24px; max-width: 480px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    h1 { font-size: 1.4rem; margin-top: 0; }
+    .search { display: flex; gap: 8px; margin-bottom: 20px; }
+    input { flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 1rem; }
+    button { padding: 10px 16px; border-radius: 8px; border: none; background: #3b82f6; color: white; font-weight: bold; cursor: pointer; }
+    button:hover { background: #2563eb; }
+    .progress-bg { background: #334155; height: 12px; border-radius: 6px; overflow: hidden; margin: 16px 0; }
+    .progress-fill { background: #22c55e; height: 100%; width: 0%; transition: width 0.4s ease; }
+    .badge { background: #065f46; color: #6ee7b7; padding: 8px 12px; border-radius: 8px; font-weight: bold; display: inline-block; margin-bottom: 12px; }
+    .info p { margin: 6px 0; color: #cbd5e1; font-size: 0.95rem; }
+    .postal { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 16px; border: 1px solid #334155; }
+    .btn-link { display: inline-block; margin-top: 10px; background: #10b981; color: #064e3b; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
+    .error { color: #f87171; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📦 Monitoreo de Pedido desde Japón</h1>
+    <div class="search">
+      <input type="text" id="codigoInput" placeholder="Ej. JP-ABC1234">
+      <button onclick="buscarPedido()">Buscar</button>
+    </div>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    // PEGA AQUÍ TU URL DE APPS SCRIPT (LA QUE TERMINA EN /exec)
+    const API_URL = "https://script.google.com/macros/s/AKfycbxnwkhAc0ySM7j24cGmdBTqYGa9Lso-fCT9hHq4YLMOSOtJHhKi9NDKYx47e5n4nlqcCA/exec";
+
+    const etapas = {
+      "Compra realizada": 25,
+      "En camino a oficina": 50,
+      "Recibido en oficina": 75,
+      "Embarcado al destino": 100
+    };
+
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+      if (id) {
+        document.getElementById("codigoInput").value = id;
+        buscarPedido();
+      }
+    };
+
+    async function buscarPedido() {
+      const codigo = document.getElementById("codigoInput").value.trim();
+      const resDiv = document.getElementById("resultado");
+      if (!codigo) return;
+
+      resDiv.innerHTML = "<p>⏳ Consultando estado en Japón...</p>";
+
+      try {
+        const response = await fetch(`${API_URL}?tracking=${encodeURIComponent(codigo)}`);
+        const data = await response.json();
+
+        if (data.status === "encontrado") {
+          const porcentaje = etapas[data.estado] || 15;
+          let postalHTML = "";
+
+          if (data.tracking_postal) {
+            let link = "";
+            const paq = data.paqueteria.toLowerCase();
+            if (paq.includes("japan post") || paq.includes("ems")) {
+              link = `https://japanpost.jp{data.tracking_postal}&locale=en`;
+            } else if (paq.includes("yamato")) {
+              link = `https://kuronekoyamato.co.jp`;
+            } else if (paq.includes("sagawa")) {
+              link = `https://sagawa-exp.co.jp{data.tracking_postal}`;
+            }
+
+            postalHTML = `
+              <div class="postal">
+                <div>✈️ <strong>Paquetería:</strong> ${data.paqueteria}</div>
+                <div>🔢 <strong>Guía Postal:</strong> <code>${data.tracking_postal}</code></div>
+                ${link ? `<a class="btn-link" href="${link}" target="_blank">🔍 Rastrear en ${data.paqueteria}</a>` : ""}
+              </div>`;
+          }
+
+          resDiv.innerHTML = `
+            <div class="info">
+              <p>👤 <strong>Cliente:</strong> ${data.cliente}</p>
+              <p>🃏 <strong>Producto:</strong> ${data.producto}</p>
+              <p>🧾 <strong>Orden:</strong> ${data.id_pedido} | 📅 ${data.fecha}</p>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" style="width: ${porcentaje}%"></div></div>
+            <div class="badge">📍 ${data.estado}</div>
+            ${postalHTML}
+          `;
+        } else {
+          resDiv.innerHTML = `<p class="error">❌ Código no encontrado. Verifica que esté bien escrito.</p>`;
+        }
+      } catch (err) {
+        resDiv.innerHTML = `<p class="error">⚠️ Error al conectar con el servidor.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
