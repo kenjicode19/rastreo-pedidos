@@ -3,44 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rastreo de Pedidos | Japón</title>
+  <title>Kanto Cards Radar (KCR) | Rastreo de Pedidos</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; padding: 40px 16px; margin: 0; }
-    .card { background: #1e293b; border-radius: 12px; padding: 24px; max-width: 480px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-    h1 { font-size: 1.4rem; margin-top: 0; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: radial-gradient(circle at top, #1e293b 0%, #0b1120 75%); color: #f8fafc; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 36px 16px; margin: 0; }
+    .card { background: #162032; border-radius: 16px; padding: 28px; max-width: 520px; width: 100%; box-shadow: 0 18px 40px rgba(0,0,0,0.5); border: 1px solid #293548; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .logo-badge { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-weight: 800; font-size: 0.95rem; padding: 8px 11px; border-radius: 10px; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35); }
+    .brand-text h1 { font-size: 1.25rem; margin: 0; letter-spacing: -0.2px; }
+    .brand-text span { font-size: 0.82rem; color: #94a3b8; }
+    .subtitle { color: #cbd5e1; font-size: 0.9rem; margin: 0 0 18px 0; line-height: 1.45; }
     .search { display: flex; gap: 8px; margin-bottom: 20px; }
-    input { flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 1rem; }
-    button { padding: 10px 16px; border-radius: 8px; border: none; background: #3b82f6; color: white; font-weight: bold; cursor: pointer; }
+    input { flex: 1; padding: 12px 14px; border-radius: 9px; border: 1px solid #334155; background: #0b1120; color: white; font-size: 1rem; text-transform: uppercase; outline: none; }
+    input:focus { border-color: #3b82f6; }
+    button { padding: 12px 18px; border-radius: 9px; border: none; background: #3b82f6; color: white; font-weight: 700; cursor: pointer; transition: background 0.2s; }
     button:hover { background: #2563eb; }
-    .progress-bg { background: #334155; height: 12px; border-radius: 6px; overflow: hidden; margin: 16px 0; }
-    .progress-fill { background: #22c55e; height: 100%; width: 0%; transition: width 0.4s ease; }
-    .badge { background: #065f46; color: #6ee7b7; padding: 8px 12px; border-radius: 8px; font-weight: bold; display: inline-block; margin-bottom: 12px; }
-    .info p { margin: 6px 0; color: #cbd5e1; font-size: 0.95rem; }
-    .postal { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 16px; border: 1px solid #334155; }
-    .btn-link { display: inline-block; margin-top: 10px; background: #10b981; color: #064e3b; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
+    .progress-bg { background: #293548; height: 10px; border-radius: 6px; overflow: hidden; margin: 16px 0 8px 0; }
+    .progress-fill { background: linear-gradient(90deg, #10b981, #22c55e); height: 100%; width: 0%; transition: width 0.4s ease; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 0.74rem; color: #64748b; text-align: center; margin-bottom: 16px; }
+    .steps span.active { color: #6ee7b7; font-weight: 700; }
+    .badge { background: #064e3b; color: #6ee7b7; border: 1px solid #047857; padding: 8px 12px; border-radius: 8px; font-weight: bold; display: inline-block; margin-bottom: 12px; font-size: 0.92rem; }
+    .info { background: #0f172a; padding: 14px; border-radius: 10px; border: 1px solid #293548; }
+    .info p { margin: 6px 0; color: #cbd5e1; font-size: 0.93rem; }
+    .postal { background: #0f172a; padding: 14px; border-radius: 10px; margin-top: 12px; border: 1px solid #293548; }
+    .btn-link { display: inline-block; margin-top: 10px; background: #10b981; color: #022c22; text-decoration: none; padding: 9px 14px; border-radius: 7px; font-weight: 700; font-size: 0.9rem; }
     .error { color: #f87171; font-weight: bold; }
+    .footer { margin-top: 22px; padding-top: 16px; border-top: 1px solid #293548; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 0.82rem; color: #94a3b8; }
+    .support-btn { color: #93c5fd; text-decoration: none; font-weight: 600; }
+    .support-btn:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>📦 Monitoreo de Pedido desde Japón</h1>
-    <div class="search">
-      <input type="text" id="codigoInput" placeholder="Ej. JP-ABC1234">
-      <button onclick="buscarPedido()">Buscar</button>
+    <div class="brand">
+      <div class="logo-badge">KCR</div>
+      <div class="brand-text">
+        <h1>Kanto Cards Radar</h1>
+        <span>Importación directa de Pokémon TCG desde Japón 🇯🇵</span>
+      </div>
     </div>
+
+    <p class="subtitle">Ingresa tu código de seguimiento (ej. <code>JP-ABC123</code>) para consultar el estado real de tu pedido.</p>
+
+    <div class="search">
+      <input type="text" id="codigoInput" placeholder="Ej. JP-ABC123">
+      <button onclick="buscarPedido()">Rastrear</button>
+    </div>
+
     <div id="resultado"></div>
+
+    <div class="footer">
+      <span>© Kanto Cards Radar (KCR)</span>
+      <a class="support-btn" id="soporteLink" href="#" target="_blank" rel="noopener">💬 Soporte en Discord</a>
+    </div>
   </div>
 
   <script>
-    // PEGA AQUÍ TU URL DE APPS SCRIPT (LA QUE TERMINA EN /exec)
     const API_URL = "https://script.google.com/macros/s/AKfycbxnwkhAc0ySM7j24cGmdBTqYGa9Lso-fCT9hHq4YLMOSOtJHhKi9NDKYx47e5n4nlqcCA/exec";
+    // PEGA AQUÍ EL LINK DE INVITACIÓN DE TU SERVIDOR DISCORD
+    const DISCORD_SOPORTE_URL = "https://discord.gg/WtDARXuZgq";
+
+    document.getElementById("soporteLink").href = DISCORD_SOPORTE_URL;
 
     const etapas = {
-      "Compra realizada": 25,
-      "En camino a oficina": 50,
+      "Pendiente de pago": 10,
+      "PAGADO": 25,
+      "Pago confirmado": 25,
+      "Compra realizada": 48,
+      "En camino a oficina": 60,
       "Recibido en oficina": 75,
       "Embarcado al destino": 100
     };
+
+    function escaparHTML(texto) {
+      return String(texto || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
     window.onload = () => {
       const params = new URLSearchParams(window.location.search);
@@ -56,7 +98,7 @@
       const resDiv = document.getElementById("resultado");
       if (!codigo) return;
 
-      resDiv.innerHTML = "<p>⏳ Consultando estado en Japón...</p>";
+      resDiv.innerHTML = "<p>⏳ Consultando estado en Tokio...</p>";
 
       try {
         const response = await fetch(`${API_URL}?tracking=${encodeURIComponent(codigo)}`);
@@ -68,31 +110,41 @@
 
           if (data.tracking_postal) {
             let link = "";
-            const paq = data.paqueteria.toLowerCase();
+            const guiaEnc = encodeURIComponent(data.tracking_postal.trim());
+            const paq = (data.paqueteria || "").toLowerCase();
+
             if (paq.includes("japan post") || paq.includes("ems")) {
-              link = `https://japanpost.jp{data.tracking_postal}&locale=en`;
+              link = `https://trackings.post.japanpost.jp/services/srv/search/direct?locale=en&reqCodeNo1=${guiaEnc}`;
             } else if (paq.includes("yamato")) {
-              link = `https://kuronekoyamato.co.jp`;
+              link = `https://jizen.kuronekoyamato.co.jp/jizen/servlet/crjz.b.NQ0010?id=${guiaEnc}`;
             } else if (paq.includes("sagawa")) {
-              link = `https://sagawa-exp.co.jp{data.tracking_postal}`;
+              link = `https://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do?okurijoNo=${guiaEnc}`;
+            } else if (paq.includes("dhl")) {
+              link = `https://www.dhl.com/global-en/home/tracking.html?tracking-id=${guiaEnc}`;
             }
 
             postalHTML = `
               <div class="postal">
-                <div>✈️ <strong>Paquetería:</strong> ${data.paqueteria}</div>
-                <div>🔢 <strong>Guía Postal:</strong> <code>${data.tracking_postal}</code></div>
-                ${link ? `<a class="btn-link" href="${link}" target="_blank">🔍 Rastrear en ${data.paqueteria}</a>` : ""}
+                <div>✈️ <strong>Paquetería:</strong> ${escaparHTML(data.paqueteria || "Asignada")}</div>
+                <div>🔢 <strong>Guía Postal:</strong> <code>${escaparHTML(data.tracking_postal)}</code></div>
+                ${link ? `<a class="btn-link" href="${link}" target="_blank" rel="noopener">🔍 Rastrear en ${escaparHTML(data.paqueteria)}</a>` : ""}
               </div>`;
           }
 
           resDiv.innerHTML = `
             <div class="info">
-              <p>👤 <strong>Cliente:</strong> ${data.cliente}</p>
-              <p>🃏 <strong>Producto:</strong> ${data.producto}</p>
-              <p>🧾 <strong>Orden:</strong> ${data.id_pedido} | 📅 ${data.fecha}</p>
+              <p>👤 <strong>Cliente:</strong> ${escaparHTML(data.cliente)}</p>
+              <p>🃏 <strong>Producto:</strong> ${escaparHTML(data.producto)}</p>
+              <p>🧾 <strong>Orden:</strong> ${escaparHTML(data.id_pedido)} | 📅 ${escaparHTML(data.fecha)} (JST)</p>
             </div>
             <div class="progress-bg"><div class="progress-fill" style="width: ${porcentaje}%"></div></div>
-            <div class="badge">📍 ${data.estado}</div>
+            <div class="steps">
+              <span class="${porcentaje >= 25 ? 'active' : ''}">1. Pago OK</span>
+              <span class="${porcentaje >= 48 ? 'active' : ''}">2. Comprada</span>
+              <span class="${porcentaje >= 75 ? 'active' : ''}">3. En Tokio</span>
+              <span class="${porcentaje >= 100 ? 'active' : ''}">4. Enviada</span>
+            </div>
+            <div class="badge">📍 ${escaparHTML(data.estado)}</div>
             ${postalHTML}
           `;
         } else {
